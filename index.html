@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Move Image</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-image: url("sky.gif");
+        background-size: cover;
+      }
+      h1 {
+        text-align: center;
+        font-size: 25px;
+        font-family: sans-serif;
+      }
+      #image {
+        width: 8%;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Move An Image With Key Press</h1>
+    <img id="image" src="bird.gif" alt="Movable Image" />
+
+    <script>
+      let img = document.getElementById("image");
+      let positionX = window.innerWidth / 2 - img.clientWidth / 2;
+      let positionY = window.innerHeight / 2 - img.clientHeight / 2;
+      let step = 10;
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowUp") {
+          if (positionY > 0) {
+            positionY -= step;
+          }
+        } else if (event.key === "ArrowDown") {
+          if (positionY < window.innerHeight - img.clientHeight) {
+            positionY += step;
+          }
+        } else if (event.key === "ArrowLeft") {
+          if (positionX > 0) {
+            positionX -= step;
+          }
+        } else if (event.key === "ArrowRight") {
+          if (positionX < window.innerWidth - img.clientWidth) {
+            positionX += step;
+          }
+        }
+
+        img.style.top = positionY + "px";
+        img.style.left = positionX + "px";
+      });
+    </script>
+  </body>
+</html>

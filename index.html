@@ -1,63 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Move Image</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-        background-image: url("sky.gif");
-        background-size: cover;
-      }
-      h1 {
-        text-align: center;
-        font-size: 25px;
-        font-family: sans-serif;
-      }
-      #image {
-        width: 8%;
-        height: auto;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Move An Image With Key Press</h1>
-    <img id="image" src="bird.gif" alt="Movable Image" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bird Dodger Game - 2 Players</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-image: url("sky.gif");
+      background-size: cover;
+      font-family: sans-serif;
+    }
 
-    <script>
-      let img = document.getElementById("image");
-      let positionX = window.innerWidth / 2 - img.clientWidth / 2;
-      let positionY = window.innerHeight / 2 - img.clientHeight / 2;
-      let step = 10;
+    #score1, #score2 {
+      position: absolute;
+      top: 10px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px black;
+    }
 
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "ArrowUp") {
-          if (positionY > 0) {
-            positionY -= step;
-          }
-        } else if (event.key === "ArrowDown") {
-          if (positionY < window.innerHeight - img.clientHeight) {
-            positionY += step;
-          }
-        } else if (event.key === "ArrowLeft") {
-          if (positionX > 0) {
-            positionX -= step;
-          }
-        } else if (event.key === "ArrowRight") {
-          if (positionX < window.innerWidth - img.clientWidth) {
-            positionX += step;
-          }
+    #score1 {
+      left: 20px;
+      color: blue;
+    }
+
+    #score2 {
+      left: 235px;
+      color: red;
+    }
+
+    #gameOver {
+      display: none;
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      text-shadow: 2px 2px 5px black;
+    }
+
+    #restartBtn, #startBtn {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #restartBtn, #startBtn {
+      display: none;
+    }
+
+    #startBtn {
+      display: block;
+    }
+
+    .bird {
+      width: 80px;
+      position: absolute;
+      left: 100px;
+      user-select: none;
+    }
+
+    #bird1 {
+      top: 200px;
+      z-index: 10;
+    }
+
+    #bird2 {
+      top: 300px;
+      z-index: 10;
+    }
+
+    .obstacle {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-color: #228B22;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .moving {
+      background-color: #FF4500;
+    }
+  </style>
+</head>
+<body>
+  <div id="score1">Player 1 Score: 0</div>
+  <div id="score2">Player 2 Score: 0</div>
+  <div id="gameOver">Game Over!</div>
+  <button id="startBtn">Start Game</button>
+  <button id="restartBtn">Restart Game</button>
+  <img id="bird1" class="bird" src="bird.gif" alt="Player 1 Bird" />
+  <img id="bird2" class="bird" src="bird.png" alt="Player 2 Bird" />
+  <audio id="scoreSound" src="score.mp3" preload="auto"></audio>
+  <audio id="hitSound" src="hit.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="background.mp3" preload="auto" loop></audio>
+
+  <script>
+    const bird1 = document.getElementById("bird1");
+    const bird2 = document.getElementById("bird2");
+    const score1Display = document.getElementById("score1");
+    const score2Display = document.getElementById("score2");
+    const gameOverText = document.getElementById("gameOver");
+    const restartBtn = document.getElementById("restartBtn");
+    const startBtn = document.getElementById("startBtn");
+    const scoreSound = document.getElementById("scoreSound");
+    const hitSound = document.getElementById("hitSound");
+    const bgMusic = document.getElementById("bgMusic");
+
+    let bird1X = 100;
+    let bird1Y = 200;
+    let bird2X = 100;
+    let bird2Y = 300;
+    const birdSpeed = 20;
+    let score1 = 0;
+    let score2 = 0;
+    let gameRunning = false;
+    let obstacleInterval;
+    let levelSpeed = 5;
+    let audioUnlocked = false;
+
+    function moveBirds(e) {
+      if (!gameRunning) return;
+
+      if (e.key === "ArrowUp" && bird1Y > 0) bird1Y -= birdSpeed;
+      if (e.key === "ArrowDown" && bird1Y < window.innerHeight - bird1.clientHeight) bird1Y += birdSpeed;
+      if (e.key === "ArrowLeft" && bird1X > 0) bird1X -= birdSpeed;
+      if (e.key === "ArrowRight" && bird1X < window.innerWidth - bird1.clientWidth) bird1X += birdSpeed;
+
+      if ((e.key === "w" || e.key === "W") && bird2Y > 0) bird2Y -= birdSpeed;
+      if ((e.key === "s" || e.key === "S") && bird2Y < window.innerHeight - bird2.clientHeight) bird2Y += birdSpeed;
+      if ((e.key === "a" || e.key === "A") && bird2X > 0) bird2X -= birdSpeed;
+      if ((e.key === "d" || e.key === "D") && bird2X < window.innerWidth - bird2.clientWidth) bird2X += birdSpeed;
+
+      bird1.style.top = bird1Y + "px";
+      bird1.style.left = bird1X + "px";
+      bird2.style.top = bird2Y + "px";
+      bird2.style.left = bird2X + "px";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!audioUnlocked) {
+        scoreSound.play().catch(() => {});
+        hitSound.play().catch(() => {});
+        bgMusic.play().catch(() => {});
+        audioUnlocked = true;
+      }
+      moveBirds(e);
+    });
+
+    function spawnObstacle() {
+      if (!gameRunning) return;
+
+      const obstacle = document.createElement("div");
+      const isMoving = Math.random() < 0.3;
+      obstacle.classList.add("obstacle");
+      if (isMoving) obstacle.classList.add("moving");
+
+      let obstacleY = Math.random() * (window.innerHeight - 60);
+      obstacle.style.top = obstacleY + "px";
+      obstacle.style.right = "-60px";
+      document.body.appendChild(obstacle);
+
+      let obstacleX = window.innerWidth;
+      let verticalDirection = 1;
+      let verticalSpeed = 2 + Math.random() * 2;
+
+      const moveInterval = setInterval(() => {
+        if (!gameRunning) {
+          clearInterval(moveInterval);
+          obstacle.remove();
+          return;
         }
 
-        img.style.top = positionY + "px";
-        img.style.left = positionX + "px";
-      });
-    </script>
-  </body>
+        obstacleX -= levelSpeed;
+        obstacle.style.right = (window.innerWidth - obstacleX) + "px";
+
+        if (isMoving) {
+          let currentTop = parseFloat(obstacle.style.top);
+          currentTop += verticalDirection * verticalSpeed;
+          if (currentTop <= 0) verticalDirection = 1;
+          if (currentTop >= window.innerHeight - 60) verticalDirection = -1;
+          obstacle.style.top = currentTop + "px";
+        }
+
+        const bird1Rect = bird1.getBoundingClientRect();
+        const bird2Rect = bird2.getBoundingClientRect();
+        const obsRect = obstacle.getBoundingClientRect();
+
+        function isCollision(birdRect, obsRect) {
+          return !(
+            birdRect.top > obsRect.bottom ||
+            birdRect.bottom < obsRect.top ||
+            birdRect.right < obsRect.left ||
+            birdRect.left > obsRect.right
+          );
+        }
+
+        if (isCollision(bird1Rect, obsRect) || isCollision(bird2Rect, obsRect)) {
+          hitSound.play();
+          endGame();
+          clearInterval(moveInterval);
+        }
+
+        if (!obstacle.passedBy) obstacle.passedBy = {};
+
+        if (!obstacle.passedBy.player1 && (obsRect.right < bird1Rect.left)) {
+          obstacle.passedBy.player1 = true;
+          score1++;
+          scoreSound.currentTime = 0;
+          scoreSound.play();
+          score1Display.textContent = "Player 1 Score: " + score1;
+          if ((score1 + score2) % 5 === 0) levelSpeed += 1;
+        }
+
+        if (!obstacle.passedBy.player2 && (obsRect.right < bird2Rect.left)) {
+          obstacle.passedBy.player2 = true;
+          score2++;
+          scoreSound.currentTime = 0;
+          scoreSound.play();
+          score2Display.textContent = "Player 2 Score: " + score2;
+          if ((score1 + score2) % 5 === 0) levelSpeed += 1;
+        }
+
+        if (obstacleX < -60) {
+          obstacle.remove();
+          clearInterval(moveInterval);
+        }
+      }, 20);
+    }
+
+    function startGame() {
+      bird1X = 100;
+      bird1Y = 200;
+      bird2X = 100;
+      bird2Y = 300;
+      bird1.style.top = bird1Y + "px";
+      bird1.style.left = bird1X + "px";
+      bird2.style.top = bird2Y + "px";
+      bird2.style.left = bird2X + "px";
+      score1 = 0;
+      score2 = 0;
+      levelSpeed = 5;
+      score1Display.textContent = "Player 1 Score: 0";
+      score2Display.textContent = "Player 2 Score: 0";
+      gameOverText.style.display = "none";
+      restartBtn.style.display = "none";
+      startBtn.style.display = "none";
+      gameRunning = true;
+      bgMusic.currentTime = 0;
+      bgMusic.play();
+      obstacleInterval = setInterval(() => {
+        if (gameRunning) spawnObstacle();
+      }, 1500);
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOverText.style.display = "block";
+      restartBtn.style.display = "block";
+      startBtn.style.display = "none";
+      clearInterval(obstacleInterval);
+      bgMusic.pause();
+    }
+
+    restartBtn.addEventListener("click", () => {
+      document.querySelectorAll(".obstacle").forEach(o => o.remove());
+      startGame();
+    });
+
+    startBtn.addEventListener("click", () => {
+      document.querySelectorAll(".obstacle").forEach(o => o.remove());
+      startGame();
+    });
+  </script>
+</body>
 </html>

@@ -1,0 +1,106 @@
+body {
+      margin: 0;
+      overflow: hidden;
+      background-image: url("sky.gif");
+      background-size: cover;
+      font-family: sans-serif;
+      background-repeat: no-repeat;
+    }
+    #score1, #score2 {
+      position: absolute;
+      top: 10px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px black;
+      transition: transform 0.2s;
+    }
+
+    #score1 { left: 20px; color: blue; }
+    #score2 { left: 235px; color: red; }
+
+    #gameOver {
+      display: none;
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: green;
+      font-size: 48px;
+      font-weight: bold;
+      text-align: center;
+      text-shadow: 2px 2px 5px black;
+      animation: pop-in 0.5s ease forwards;
+    }
+
+    #restartBtn, #startBtn {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #restartBtn, #startBtn { display: none; }
+    #startBtn { display: block; }
+
+    button:hover {
+      box-shadow: 0 0 10px rgba(0,0,0,0.9);
+      transform: scale(1.05);
+    }
+
+    .bird {
+      width: 150px;
+      position: absolute;
+      left: 100px;
+      user-select: none;
+      z-index: 10;
+    }
+
+    #bird1 { top: 200px; }
+    #bird2 { top: 300px; }
+
+    .obstacle {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-color: #228B22;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .moving { background-color: #FF4500; }
+
+    #countdown {
+      display: none;
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 64px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 5px black;
+    }
+
+    .player-label {
+      position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px black;
+      z-index: 11;
+      pointer-events: none;
+      user-select: none;
+      transition: left 0.1s, top 0.1s;
+    }
+    #label1 {
+      color: blue;
+    }
+    #label2 {
+      color: red;
+    }

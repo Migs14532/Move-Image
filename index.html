@@ -1,32 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bird Dodger Game - 2 Players</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choices</title>
+    <link rel="stylesheet" href="choices.css">
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: #e3f2fd;
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        margin-bottom: 40px;
+        color: #1976d2;
+      }
+      .choice-btn {
+        padding: 20px 60px;
+        margin: 20px;
+        font-size: 2rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%);
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      }
+      .choice-btn:hover {
+        background: linear-gradient(90deg, #1976d2 0%, #4fc3f7 100%);
+        transform: scale(1.08);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      }
+    </style>
 </head>
 <body>
 
-  <div id="score1">Player 1 Score: 0</div>
-  <div id="score2">Player 2 Score: 0</div>
-  <div id="gameOver">Game Over!</div>
-  <div id="countdown"></div>
+    <h1>Choose Game Mode</h1>
+    <button class="choice-btn" id="soloBtn">Solo</button>
+    <button class="choice-btn" id="multiBtn">Multiplayer</button>
 
-  <button id="startBtn">Start Game</button>
-  <button id="restartBtn">Restart Game</button>
-
-  <img id="bird1" class="bird" src="bird.gif" alt="Player 1 Bird" />
-  <span id="label1" class="player-label" style="left: 100px; top: 180px;">Player 1</span>
-
-  <img id="bird2" class="bird" src="bird2.gif" alt="Player 2 Bird" />
-  <span id="label2" class="player-label" style="left: 100px; top: 280px;">Player 2</span>
-
-  <audio id="scoreSound" src="score.mp3" preload="auto"></audio>
-  <audio id="hitSound" src="hit.mp3" preload="auto"></audio>
-  <audio id="bgMusic" src="background.mp3" preload="auto" loop></audio>
-
-  <script src="script.js"></script>
-
+    <script>
+      document.getElementById('soloBtn').onclick = function() {
+        window.location.href = "Solo.html";
+      };
+      document.getElementById('multiBtn').onclick = function() {
+        window.location.href = "Multiplayer.html";
+      };
+    </script>
 </body>
 </html>

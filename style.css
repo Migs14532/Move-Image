@@ -104,3 +104,26 @@ body {
     #label2 {
       color: red;
     }
+
+    h1 {
+            margin-bottom: 40px;
+            color: #1976d2;
+        }
+        .choice-btn {
+            padding: 20px 60px;
+            margin: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .choice-btn:hover {
+            background: linear-gradient(90deg, #1976d2 0%, #4fc3f7 100%);
+            transform: scale(1.08);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }

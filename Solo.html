@@ -12,7 +12,7 @@
   <div id="countdown"></div>
 
   <button id="startBtn">Start Game</button>
-  <button id="restartBtn">Restart Game</button>
+  <button id="chooseBtn">Choose Game Mode</button>
 
   <img id="bird1" class="bird" src="bird.gif" alt="Bird" />
   <span id="label1" class="player-label" style="left: 100px; top: 180px;">You</span>
@@ -27,29 +27,32 @@
     const label = document.getElementById("label1");
     const scoreDisplay = document.getElementById("score1");
     const gameOverText = document.getElementById("gameOver");
-    const restartBtn = document.getElementById("restartBtn");
+    const chooseBtn = document.getElementById("chooseBtn");
     const startBtn = document.getElementById("startBtn");
     const scoreSound = document.getElementById("scoreSound");
     const hitSound = document.getElementById("hitSound");
     const bgMusic = document.getElementById("bgMusic");
     const countdownDiv = document.getElementById("countdown");
 
-    // ====== GAME STATE ======
     let birdX = 100, birdY = 200;
-    const birdSpeed = 20;
+    // Change birdSpeed to a lower value for slower movement
+    const birdSpeed = 6; // Try 5-8 for slow, smooth movement
     let score = 0;
     let gameRunning = false;
     let obstacleInterval;
     let levelSpeed = 5;
     let audioUnlocked = false;
 
-    // ====== CONTROL HANDLING ======
     document.addEventListener("keydown", (e) => {
       if (!audioUnlocked) {
         [scoreSound, hitSound, bgMusic].forEach(audio => audio.play().catch(() => {}));
         audioUnlocked = true;
       }
-      moveBird(e);
+      keysPressed[e.key.toLowerCase()] = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      keysPressed[e.key.toLowerCase()] = false;
     });
 
     startBtn.addEventListener("click", () => {
@@ -57,20 +60,29 @@
       startGame();
     });
 
-    restartBtn.addEventListener("click", () => {
+    chooseBtn.addEventListener("click", () => {
       window.location.href = "index.html";
     });
 
-    // ====== MOVEMENT ======
-    function moveBird(e) {
+    //      MOVEMENT
+    let keysPressed = {};
+
+    // Smooth movement loop
+    function gameLoop() {
       if (!gameRunning) return;
 
-      if ((e.key === "w" || e.key === "W" || e.key === "ArrowUp") && birdY > 0) birdY -= birdSpeed;
-      if ((e.key === "s" || e.key === "S" || e.key === "ArrowDown") && birdY < window.innerHeight - bird.clientHeight) birdY += birdSpeed;
-      if ((e.key === "a" || e.key === "A" || e.key === "ArrowLeft") && birdX > 0) birdX -= birdSpeed;
-      if ((e.key === "d" || e.key === "D" || e.key === "ArrowRight") && birdX < window.innerWidth - bird.clientWidth) birdX += birdSpeed;
+      // Up
+      if ((keysPressed["w"] || keysPressed["arrowup"]) && birdY > 0) birdY -= birdSpeed;
+      // Down
+      if ((keysPressed["s"] || keysPressed["arrowdown"]) && birdY < window.innerHeight - bird.clientHeight) birdY += birdSpeed;
+      // Left
+      if ((keysPressed["a"] || keysPressed["arrowleft"]) && birdX > 0) birdX -= birdSpeed;
+      // Right
+      if ((keysPressed["d"] || keysPressed["arrowright"]) && birdX < window.innerWidth - bird.clientWidth) birdX += birdSpeed;
 
       updateBirdPosition(bird, label, birdX, birdY);
+
+      requestAnimationFrame(gameLoop);
     }
 
     function updateBirdPosition(bird, label, x, y) {
@@ -81,7 +93,7 @@
       label.style.display = "block";
     }
 
-    // ====== OBSTACLES ======
+    //      OBSTACLES
     function spawnObstacle() {
       if (!gameRunning) return;
 
@@ -121,7 +133,7 @@
       }, 20);
     }
 
-    // ====== COLLISION DETECTION ======
+    //         COLLISION DETECTION
     function checkCollision(obstacle, moveInterval) {
       const birdRect = bird.getBoundingClientRect();
       const obsRect = obstacle.getBoundingClientRect();
@@ -155,7 +167,7 @@
       }
     }
 
-    // ====== COUNTDOWN ======
+    //      COUNTDOWN
     function showCountdown(callback) {
       let count = 3;
       countdownDiv.style.display = "block";
@@ -175,7 +187,7 @@
       }, 800);
     }
 
-    // ====== START GAME ======
+    //      START GAME
     function startGame() {
       birdX = 100;
       birdY = 200;
@@ -189,7 +201,7 @@
       scoreDisplay.textContent = "Score: 0";
       scoreDisplay.style.display = "block";
       gameOverText.style.display = "none";
-      restartBtn.style.display = "none";
+      chooseBtn.style.display = "none";
       startBtn.style.display = "none";
 
       bgMusic.currentTime = 0;
@@ -198,18 +210,29 @@
       showCountdown(() => {
         gameRunning = true;
         obstacleInterval = setInterval(spawnObstacle, 1500);
+        requestAnimationFrame(gameLoop); // Start smooth movement
       });
     }
 
-    // ====== END GAME ======
+    //      END GAME
     function endGame() {
       gameRunning = false;
       clearInterval(obstacleInterval);
       gameOverText.textContent = `Game Over! Final Score: ${score}`;
       gameOverText.style.display = "block";
-      restartBtn.style.display = "block";
       bgMusic.pause();
-      // No redirect, only restart button goes to choices
+
+      setTimeout(() => {
+        const retry = confirm("Do you want to retry the game?\n\nChoose 'OK' for Yes, 'Cancel' for No.");
+        if (retry) {
+          document.querySelectorAll(".obstacle").forEach(o => o.remove());
+          startGame();
+        } else {
+          // Show the Choose Game Mode button, hide game elements
+          chooseBtn.style.display = "block";
+          gameOverText.style.display = "block";
+        }
+      }, 100); // Small delay to ensure Game Over message is visible before alert
     }
   </script>
 </body>

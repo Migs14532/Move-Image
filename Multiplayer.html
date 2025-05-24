@@ -14,7 +14,7 @@
   <div id="countdown"></div>
 
   <button id="startBtn">Start Game</button>
-  <button id="restartBtn">Restart Game</button>
+  <button id="chooseBtn">Choose Game Mode</button>
 
   <img id="bird1" class="bird" src="bird.gif" alt="Player 1 Bird" />
   <span id="label1" class="player-label" style="left: 100px; top: 180px;">Player 1</span>
@@ -35,24 +35,22 @@
     const score1Display = document.getElementById("score1");
     const score2Display = document.getElementById("score2");
     const gameOverText = document.getElementById("gameOver");
-    const restartBtn = document.getElementById("restartBtn");
     const startBtn = document.getElementById("startBtn");
+    const chooseBtn = document.getElementById("chooseBtn");
     const scoreSound = document.getElementById("scoreSound");
     const hitSound = document.getElementById("hitSound");
     const bgMusic = document.getElementById("bgMusic");
     const countdownDiv = document.getElementById("countdown");
 
-    // ====== GAME STATE ======
     let bird1X = 100, bird1Y = 200;
     let bird2X = 100, bird2Y = 300;
-    const birdSpeed = 20;
+    const birdSpeed = 5; // Try 8 or 10 for slower, smooth movement
     let score1 = 0, score2 = 0;
     let gameRunning = false;
     let obstacleInterval;
     let levelSpeed = 5;
     let audioUnlocked = false;
 
-    // ====== CONTROL HANDLING ======
     document.addEventListener("keydown", (e) => {
       if (!audioUnlocked) {
         [scoreSound, hitSound, bgMusic].forEach(audio => audio.play().catch(() => {}));
@@ -66,28 +64,36 @@
       startGame();
     });
 
-    restartBtn.addEventListener("click", () => {
+    chooseBtn.addEventListener("click", () => {
+      // Go back to choices (index.html) when Choose Game Mode is clicked
       window.location.href = "index.html";
     });
 
-    // ====== MOVEMENT ======
+    //      MOVEMENT
+    // Track if each player is still alive
+    let player1Alive = true;
+    let player2Alive = true;
+
     function moveBirds(e) {
       if (!gameRunning) return;
 
       // Player 1 Controls (Arrow keys)
-      if (e.key === "ArrowUp" && bird1Y > 0) bird1Y -= birdSpeed;
-      if (e.key === "ArrowDown" && bird1Y < window.innerHeight - bird1.clientHeight) bird1Y += birdSpeed;
-      if (e.key === "ArrowLeft" && bird1X > 0) bird1X -= birdSpeed;
-      if (e.key === "ArrowRight" && bird1X < window.innerWidth - bird1.clientWidth) bird1X += birdSpeed;
+      if (player1Alive) {
+        if (e.key === "ArrowUp" && bird1Y > 0) bird1Y -= birdSpeed;
+        if (e.key === "ArrowDown" && bird1Y < window.innerHeight - bird1.clientHeight) bird1Y += birdSpeed;
+        if (e.key === "ArrowLeft" && bird1X > 0) bird1X -= birdSpeed;
+        if (e.key === "ArrowRight" && bird1X < window.innerWidth - bird1.clientWidth) bird1X += birdSpeed;
+        updateBirdPosition(bird1, label1, bird1X, bird1Y);
+      }
 
       // Player 2 Controls (WASD)
-      if ((e.key === "w" || e.key === "W") && bird2Y > 0) bird2Y -= birdSpeed;
-      if ((e.key === "s" || e.key === "S") && bird2Y < window.innerHeight - bird2.clientHeight) bird2Y += birdSpeed;
-      if ((e.key === "a" || e.key === "A") && bird2X > 0) bird2X -= birdSpeed;
-      if ((e.key === "d" || e.key === "D") && bird2X < window.innerWidth - bird2.clientWidth) bird2X += birdSpeed;
-
-      updateBirdPosition(bird1, label1, bird1X, bird1Y);
-      updateBirdPosition(bird2, label2, bird2X, bird2Y);
+      if (player2Alive) {
+        if ((e.key === "w" || e.key === "W") && bird2Y > 0) bird2Y -= birdSpeed;
+        if ((e.key === "s" || e.key === "S") && bird2Y < window.innerHeight - bird2.clientHeight) bird2Y += birdSpeed;
+        if ((e.key === "a" || e.key === "A") && bird2X > 0) bird2X -= birdSpeed;
+        if ((e.key === "d" || e.key === "D") && bird2X < window.innerWidth - bird2.clientWidth) bird2X += birdSpeed;
+        updateBirdPosition(bird2, label2, bird2X, bird2Y);
+      }
     }
 
     function updateBirdPosition(bird, label, x, y) {
@@ -98,7 +104,47 @@
       label.style.display = "block";
     }
 
-    // ====== OBSTACLES ======
+    // --- Enable simultaneous movement for both players ---
+    let keysPressed = {};
+
+    document.addEventListener("keydown", (e) => {
+      if (!audioUnlocked) {
+        [scoreSound, hitSound, bgMusic].forEach(audio => audio.play().catch(() => {}));
+        audioUnlocked = true;
+      }
+      keysPressed[e.key.toLowerCase()] = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      keysPressed[e.key.toLowerCase()] = false;
+    });
+
+    // Animation loop for smooth, simultaneous movement
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      // Player 1 Controls (Arrow keys)
+      if (player1Alive) {
+        if (keysPressed["arrowup"] && bird1Y > 0) bird1Y -= birdSpeed;
+        if (keysPressed["arrowdown"] && bird1Y < window.innerHeight - bird1.clientHeight) bird1Y += birdSpeed;
+        if (keysPressed["arrowleft"] && bird1X > 0) bird1X -= birdSpeed;
+        if (keysPressed["arrowright"] && bird1X < window.innerWidth - bird1.clientWidth) bird1X += birdSpeed;
+        updateBirdPosition(bird1, label1, bird1X, bird1Y);
+      }
+
+      // Player 2 Controls (WASD)
+      if (player2Alive) {
+        if (keysPressed["w"] && bird2Y > 0) bird2Y -= birdSpeed;
+        if (keysPressed["s"] && bird2Y < window.innerHeight - bird2.clientHeight) bird2Y += birdSpeed;
+        if (keysPressed["a"] && bird2X > 0) bird2X -= birdSpeed;
+        if (keysPressed["d"] && bird2X < window.innerWidth - bird2.clientWidth) bird2X += birdSpeed;
+        updateBirdPosition(bird2, label2, bird2X, bird2Y);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    //      OBSTACLES
     function spawnObstacle() {
       if (!gameRunning) return;
 
@@ -138,7 +184,7 @@
       }, 20);
     }
 
-    // ====== COLLISION DETECTION ======
+    //      COLLISION DETECTION
     function checkCollision(obstacle, moveInterval) {
       const bird1Rect = bird1.getBoundingClientRect();
       const bird2Rect = bird2.getBoundingClientRect();
@@ -151,26 +197,33 @@
                  birdRect.left > obsRect.right);
       }
 
-      if (isCollision(bird1Rect, obsRect)) {
+      if (player1Alive && isCollision(bird1Rect, obsRect)) {
         hitSound.play();
         bird1.style.display = "none";
         label1.style.display = "none";
-        endGame("Player 1");
+        player1Alive = false;
+        // Remove the obstacle that hit player 1
+        obstacle.remove();
         clearInterval(moveInterval);
+        endGame("Player 1");
         return;
       }
-      if (isCollision(bird2Rect, obsRect)) {
+      if (player2Alive && isCollision(bird2Rect, obsRect)) {
         hitSound.play();
         bird2.style.display = "none";
         label2.style.display = "none";
-        endGame("Player 2");
+        player2Alive = false;
+        // Remove the obstacle that hit player 2
+        obstacle.remove();
         clearInterval(moveInterval);
+        endGame("Player 2");
         return;
       }
 
       if (!obstacle.passedBy) obstacle.passedBy = {};
 
-      if (!obstacle.passedBy.player1 && (obsRect.right < bird1Rect.left)) {
+      // Only count score for alive players
+      if (player1Alive && !obstacle.passedBy.player1 && (obsRect.right < bird1Rect.left)) {
         obstacle.passedBy.player1 = true;
         score1++;
         scoreSound.currentTime = 0;
@@ -179,7 +232,7 @@
         if ((score1 + score2) % 5 === 0) levelSpeed += 1;
       }
 
-      if (!obstacle.passedBy.player2 && (obsRect.right < bird2Rect.left)) {
+      if (player2Alive && !obstacle.passedBy.player2 && (obsRect.right < bird2Rect.left)) {
         obstacle.passedBy.player2 = true;
         score2++;
         scoreSound.currentTime = 0;
@@ -194,7 +247,7 @@
       }
     }
 
-    // ====== COUNTDOWN ======
+    //      COUNTDOWN 
     function showCountdown(callback) {
       let count = 3;
       countdownDiv.style.display = "block";
@@ -216,13 +269,15 @@
       }, 800);
     }
 
-    // ====== START GAME ======
+    //      START GAME
     function startGame() {
       bird1X = 100; bird1Y = 200;
       bird2X = 100; bird2Y = 300;
       score1 = 0; score2 = 0;
       levelSpeed = 5;
       gameRunning = false;
+      player1Alive = true;
+      player2Alive = true;
 
       updateBirdPosition(bird1, label1, bird1X, bird1Y);
       updateBirdPosition(bird2, label2, bird2X, bird2Y);
@@ -235,7 +290,7 @@
       score1Display.style.display = "block";
       score2Display.style.display = "block";
       gameOverText.style.display = "none";
-      restartBtn.style.display = "none";
+      chooseBtn.style.display = "none";
       startBtn.style.display = "none";
 
       bgMusic.currentTime = 0;
@@ -244,23 +299,65 @@
       showCountdown(() => {
         gameRunning = true;
         obstacleInterval = setInterval(spawnObstacle, 1500);
+        requestAnimationFrame(gameLoop); // Start the movement loop
       });
     }
 
-    // ====== END GAME ======
+    //     END GAME
     function endGame(loser) {
+      // Mark the player as not alive and hide their bird/label
+      if (loser === "Player 1") {
+        player1Alive = false;
+        bird1.style.display = "none";
+        label1.style.display = "none";
+      } else if (loser === "Player 2") {
+        player2Alive = false;
+        bird2.style.display = "none";
+        label2.style.display = "none";
+      }
+
+      // Game is over as soon as one player loses
       gameRunning = false;
       clearInterval(obstacleInterval);
-      const winner = loser === "Player 1" ? "Player 2" : "Player 1";
-      gameOverText.textContent = `${loser} Loses!`;
-      gameOverText.style.display = "block";
-      restartBtn.style.display = "block";
       bgMusic.pause();
 
-      // After 3 seconds, show the winner
+      // Determine winner by who is still alive
+      let winner;
+      if (!player1Alive && player2Alive) {
+        winner = "Player 2";
+      } else if (!player2Alive && player1Alive) {
+        winner = "Player 1";
+      } else {
+        winner = "No one";
+      }
+
+      let finalScore = Math.max(score1, score2);
+
+      // Show who lost
+      gameOverText.textContent = `${loser} Loses!`;
+      gameOverText.style.display = "block";
+      chooseBtn.style.display = "block";
+
+      // After 1 second, show the winner and final score
       setTimeout(() => {
-        gameOverText.textContent = `${winner} Wins!`;
-      }, 3000);
+        gameOverText.textContent = `${winner} Wins! Final Score: ${finalScore}`;
+        showRetryButton();
+      }, 1000);
+    }
+
+    // Replace showRetryButton function with alert-based retry logic
+    function showRetryButton() {
+      setTimeout(() => {
+        const retry = confirm("Do you want to retry the game?\n\nChoose 'OK' for Yes, 'Cancel' for No.");
+        if (retry) {
+          document.querySelectorAll(".obstacle").forEach(o => o.remove());
+          startGame();
+        } else {
+          // Show the Choose Game Mode button, hide game elements
+          chooseBtn.style.display = "block";
+          gameOverText.style.display = "block";
+        }
+      }, 100); // Small delay to ensure winner message is visible before alert
     }
   </script>
 </body>

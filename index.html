@@ -1,57 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choices</title>
-    <link rel="stylesheet" href="choices.css">
-    <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background: #e3f2fd;
-        font-family: Arial, sans-serif;
-      }
-      h1 {
-        margin-bottom: 40px;
-        color: #1976d2;
-      }
-      .choice-btn {
-        padding: 20px 60px;
-        margin: 20px;
-        font-size: 2rem;
-        font-weight: bold;
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%);
-        color: white;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-      }
-      .choice-btn:hover {
-        background: linear-gradient(90deg, #1976d2 0%, #4fc3f7 100%);
-        transform: scale(1.08);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-      }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choices</title>
+  <link rel="stylesheet" href="choices.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      background-image: url(https://metro.co.uk/wp-content/uploads/2015/02/giphy3.gif?w=646);
+    }
+  </style>
 </head>
 <body>
-
+  <div class="container">
     <h1>Choose Game Mode</h1>
     <button class="choice-btn" id="soloBtn">Solo</button>
     <button class="choice-btn" id="multiBtn">Multiplayer</button>
+  </div>
 
-    <script>
-      document.getElementById('soloBtn').onclick = function() {
-        window.location.href = "Solo.html";
-      };
-      document.getElementById('multiBtn').onclick = function() {
-        window.location.href = "Multiplayer.html";
-      };
-    </script>
+  <script>
+    document.getElementById('soloBtn').onclick = function() {
+      window.location.href = "Solo.html";
+    };
+    document.getElementById('multiBtn').onclick = function() {
+      window.location.href = "Multiplayer.html";
+    };
+  </script>
 </body>
 </html>

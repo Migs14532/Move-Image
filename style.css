@@ -1,129 +1,186 @@
 body {
-      margin: 0;
-      overflow: hidden;
-      background-image: url("sky.gif");
-      background-size: cover;
-      font-family: sans-serif;
-      background-repeat: no-repeat;
-    }
-    #score1, #score2 {
-      position: absolute;
-      top: 10px;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px black;
-      transition: transform 0.2s;
-    }
+  margin: 0;
+  overflow: hidden;
+  background-image: url("sky.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    #score1 { left: 20px; color: blue; }
-    #score2 { left: 235px; color: red; }
+.container {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px 60px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 400px;
+}
 
-    #gameOver {
-      display: none;
-      position: absolute;
-      top: 35%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: green;
-      font-size: 48px;
-      font-weight: bold;
-      text-align: center;
-      text-shadow: 2px 2px 5px black;
-      animation: pop-in 0.5s ease forwards;
-    }
+h1 {
+  margin-bottom: 40px;
+  color: #1976d2;
+}
 
-    #restartBtn, #startBtn {
-      position: absolute;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+.choice-btn {
+  padding: 20px 60px;
+  margin: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
 
-    #restartBtn, #startBtn { display: none; }
-    #startBtn { display: block; }
+.choice-btn:hover {
+  background: linear-gradient(90deg, #1976d2 0%, #4fc3f7 100%);
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
 
-    button:hover {
-      box-shadow: 0 0 10px rgba(0,0,0,0.9);
-      transform: scale(1.05);
-    }
+button:hover {
+  box-shadow: 0 0 10px rgba(0,0,0,0.9);
+  transform: scale(1.05);
+}
 
-    .bird {
-      width: 150px;
-      position: absolute;
-      left: 100px;
-      user-select: none;
-      z-index: 10;
-    }
+#score1, #score2 {
+  position: absolute;
+  top: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px black;
+  transition: transform 0.2s;
+}
 
-    #bird1 { top: 200px; }
-    #bird2 { top: 300px; }
+#score1 {
+  left: 20px;
+  color: blue;
+}
 
-    .obstacle {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background-color: #228B22;
-      border-radius: 12px;
-      pointer-events: none;
-    }
+#score2 {
+  left: 235px;
+  color: red;
+}
 
-    .moving { background-color: #FF4500; }
+#gameOver {
+  display: none;
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: green;
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 5px black;
+  animation: pop-in 0.5s ease forwards;
+}
 
-    #countdown {
-      display: none;
-      position: absolute;
-      top: 45%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 64px;
-      font-weight: bold;
-      color: white;
-      text-shadow: 2px 2px 5px black;
-    }
+#restartBtn, #startBtn {
+  color: white;
+  background-color: rgb(25, 118, 210);
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-    .player-label {
-      position: absolute;
-      font-size: 20px;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px black;
-      z-index: 11;
-      pointer-events: none;
-      user-select: none;
-      transition: left 0.1s, top 0.1s;
-    }
-    #label1 {
-      color: blue;
-    }
-    #label2 {
-      color: red;
-    }
+#restartBtn, #startBtn {
+  display: none;
+}
 
-    h1 {
-            margin-bottom: 40px;
-            color: #1976d2;
-        }
-        .choice-btn {
-            padding: 20px 60px;
-            margin: 20px;
-            font-size: 2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%);
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-        }
-        .choice-btn:hover {
-            background: linear-gradient(90deg, #1976d2 0%, #4fc3f7 100%);
-            transform: scale(1.08);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-        }
+#startBtn {
+  display: block;
+}
+
+.bird {
+  width: 150px;
+  position: absolute;
+  left: 100px;
+  user-select: none;
+  z-index: 10;
+}
+
+#bird1 { top: 200px; }
+#bird2 { top: 300px; }
+
+.obstacle {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-color: #228B22;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.moving {
+  background-color: #FF4500;
+}
+
+#countdown {
+  display: none;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 64px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 5px black;
+}
+
+.player-label {
+  position: absolute;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px black;
+  z-index: 11;
+  pointer-events: none;
+  user-select: none;
+  transition: left 0.1s, top 0.1s;
+}
+
+#label1 {
+  color: blue;
+}
+
+#label2 {
+  color: red;
+}
+
+#chooseBtn {
+  color: white;
+  background-color: #388e3c;
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 28px;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: none;
+}
+
+#chooseBtn:hover {
+  background-color: #2e7031;
+  transform: translate(-50%, -50%) scale(1.05);
+}
